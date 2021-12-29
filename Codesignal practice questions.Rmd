@@ -1,0 +1,282 @@
+---
+title: "Codesignal practice"
+author: "Jolene"
+date: "12/30/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(stringr)
+library(dplyr)
+```
+
+## Question 1
+You are given an array of integers `a` and two integers `l` and `r`. You task is to calculate a boolean array `b`, where `b[i] = true` if there exists an integer `x`, such that `a[i] = (i + 1) * x` and `l ≤ x ≤ r`. Otherwise, `b[i`] should be set to false.
+
+Example
+For `a = [8, 5, 6, 16, 5], l = 1`, and `r = 3`, the output should be `solution(a, l, r) = [false, false, true, false, true]`.
+•	For `a[0] = 8`, we need to find a value of x such that `1 * x = 8`, but the only value that would work is `x = 8` which doesn't satisfy the boundaries `1 ≤ x ≤ 3`, so `b[0] = false.`
+•	For `a[1] = 5`, we need to find a value of x such that `2 * x = 5`, but there is no integer value that would satisfy this equation, so `b[1] = false.`
+•	For `a[2] = 6`, we can choose `x = 2` because `3 * 2 = 6` and `1 ≤ 2 ≤ 3`, so `b[2] = true.`
+•	For `a[3] = 16`, there is no integer `1 ≤ x ≤ 3`, such that `4 * x = 16`, so `b[3] = false.`
+•	For `a[4] = 5`, we can choose `x = 1` because `5 * 1 = 5` and `1 ≤ 1 ≤ 3`, so `b[4] = true`.
+
+Input/Output
+•	[execution time limit] 5 seconds (r)
+•	[input] array.integer `a`
+    An array of integers.
+    Guaranteed constraints:
+    `1 ≤ a.length ≤ 100`,
+    `1 ≤ a[i] ≤ 106.`
+•	[input] integer `l`
+    An integer representing the lower bound for `x`
+    Guaranteed constraints:
+    `1 ≤ l ≤ 104.`
+•	[input] integer `r`
+    An integer representing the upper bound for `x`
+    Guaranteed constraints:
+    `1 ≤ r ≤ 104`,
+    `l ≤ rZ`.
+•	[output] array.boolean
+    A boolean array.
+
+```{r }
+solution <- function(a, l, r) {
+  b <- c()
+  for (i in 1:length(a)){
+    x = a[i]/(i)
+    if (l <= x && x <= r && x%%1 == 0){
+      b[i] <- TRUE
+    } else {
+      b[i] <- FALSE
+    }
+  }
+  return((b))
+}
+
+a <- array(c(8, 5, 6, 16, 5))
+l <- 1
+r <- 3
+solution(a, l, r)
+
+a <- c(100)
+l <- 1
+r <- 1000
+solution(a, l, r)
+```
+
+## Question 2
+You are given a string `s`. Consider the following algorithm applied to this string:
+1.	Take all the prefixes of the string, and choose the longest palindrome between them.
+2.	If this chosen prefix contains at least two characters, cut this prefix from `s` and go back to the first step with the updated string. Otherwise, end the algorithm with the current string s as a result.
+
+Your task is to implement the above algorithm and return its result when applied to string `s`.
+Note: you can click on the prefixes and palindrome words to see the definition of the terms if you're not familiar with them.
+Example
+•	For `s = "aaacodedoc"`, the output should be `solution(s) = ""`.
+    o	The initial string `s = "aaacodedoc"` contains only three prefixes which are also palindromes - `"a"`, `"aa"`, `"aaa"`. The longest one between them is `"aaa"`, so we cut it from `s`.
+    o	Now we have string `"codedoc"`. It contains two prefixes which are also palindromes - `"c"` and `"codedoc"`. The longest one between them is `"codedoc"`, so we cut if from the current string and obtain the empty string.
+    o	Finally the algorithm ends on the empty string, so the answer is `""` .
+•	For `s = "codesignal"`, the output should be `solution(s) = "codesignal"`.
+    The initial string `s = "codesignal"` contains the only prefix, which is also palindrome - `"c"`. This prefix is the longest, but doesn't contain two characters, so the algorithm ends with string "codesignal" as a result.
+•	For `s = ""`, the output should be `solution(s) = ""`.
+
+Input/Output
+•	[execution time limit] 5 seconds (r)
+•	[input] string `s`
+    A string consisting of English lowercase letters.
+    Guaranteed constraints:
+    `0 ≤ s.length ≤ 1000`.
+•	[output] string
+    The result of the described algorithm.
+
+```{r }
+solution <- function(s){
+  s <- str_split(s, '')[[1]]
+  while (length(s) > 0) {
+    for (i in 1:length(s)) {
+      if (s[1:i] == rev(s[1:i])) {
+        q <- i
+      }
+    }
+    if (q > 1) {
+      s <- s[-(1:q)]
+      if (length(s) == 0) {
+        s <- ''
+      }
+    } else {
+      break
+    }
+  }
+  s <- paste(s, collapse = "")
+  return(list(s))
+}
+
+s <- 'aaacodedoc'
+solution(s)
+
+s <- 'codesignal'
+solution(s)
+```
+
+
+## Question 3
+You are implementing your own programming language and you've decided to add support for merging strings. A typical `merge` function would take two strings `s1` and `s2`, and return the lexicographically smallest result that can be obtained by placing the symbols of `s2` between the symbols of `s1` in such a way that maintains the relative order of the characters in each string.
+For example, if `s1 = "super"` and `s2 = "tower"`, the result should be `merge(s1, s2) = "stouperwer"`.
+
+You'd like to make your language more unique, so for your `merge` function, instead of comparing the characters in the usual lexicographical order, you'll compare them based on how many times they occur in their respective initial strings (fewer occurrences means the character is considered smaller). If the number of occurrences are equal, then the characters should be compared in the usual lexicographical way. If both number of occurences and characters are equal, you should take the characters from the first string to the result. Note that occurrences in the initial strings are compared - they do not change over the merge process.
+Given two strings `s1` and `s2`, return the result of the special `merge` function you are implementing.
+
+Example
+•	For `s1 = "dce"` and `s2 = "cccbd"`, the output should be `solution(s1, s2) = "dcecccbd"`.
+    All symbols from `s1` goes first, because all of them have only 1 occurrence in `s1` and `c` has 3 occurrences in `s2.`
+•	For `s1 = "super"` and `s2 = "tower"`, the output should be `solution(s1, s2) = "stouperwer"`.
+    Because in both strings all symbols occur only 1 time, strings are merged as usual. You can find explanation for this example on the image in the description.
+    
+Input/Output
+•	[execution time limit] 5 seconds (r)
+•	[input] string `s1`
+    A string consisting only of lowercase English letters.
+    Guaranteed constraints:
+    `1 ≤ s1.length ≤ 104`.
+•	[input] string `s2`
+    A string consisting only of lowercase English letters.
+    Guaranteed constraints:
+    `1 ≤ s2.length ≤ 104`.
+•	[output] string
+    The string that results by merging `s1` and `s2` using your special merge function.
+
+```{r}
+merge <- function(s1, s2){
+  m <- nchar(s1)
+  n <- nchar(s2)
+  s1_tab <- table(str_split(s1, '')) %>% rbind() %>% data.frame()
+  s2_tab <- table(str_split(s2, '')) %>% rbind() %>% data.frame()
+  s1_split <- str_split(s1, '')[[1]]
+  s2_split <- str_split(s2, '')[[1]]
+
+  # creating empty df to track frequency of each letter
+  df <- data.frame(matrix(ncol = 26, nrow = 0))
+  colnames(df) <- letters[1:26]
+  df <- full_join(df, s1_tab) %>% full_join(., s2_tab)
+  
+  y <- c()
+  a <- 1
+  b <- 1
+  
+  for (i in 1:(m+n)) {
+    if (df[[s1_split[a]]][1] < df[[s2_split[b]]][2]){
+      y[i] <- s1_split[a]
+      a <- a + 1
+    } else if (df[[s1_split[a]]][1] > df[[s2_split[b]]][2]){
+      y[i] <- s2_split[b]
+      b <- b + 1
+    } else {
+      if (s1_split[a]>s2_split[b]){
+        y[i] <- s2_split[b]
+        b <- b + 1
+      } else {
+        y[i] <- s1_split[a]
+        a <- a + 1
+      } 
+    }
+    
+    # if one string is exhausted, simply copy the rest of the other string 
+    if (a == m + 1){
+      for (j in (i+1):(m+n)){
+        y[j] <- s2_split[b]
+        b <- b + 1
+      }
+      return(y)
+      break
+    }  else if (b == n + 1){
+      for (j in (i+1):(m+n)){
+        y[j] <- s1_split[a]
+        a <- a + 1
+      }
+      return(y)
+      break
+    }
+  }
+}
+
+s1 <- 'dec'
+s2 <- 'cccbd'
+merge(s1, s2)
+
+s1 <- 'super'
+s2 <- 'tower'
+merge(s1, s2)
+```
+
+
+## Question 4
+Given an array of integers `arr`, a positive integer `k`, and an integer `s`, your task is to find the number of non-empty contiguous subarrays with length not greater than `k` and with a sum equal to `s`.
+
+Example
+•	For `arr = [1, 0]`, `k = 2`, and `s = 1`, the output should be `solution(arr, k, s) = 2`.
+    o	There is `1` subarray among the contiguous subarrays of length `1` with sum equal to `s = 1`, and it is `[1]`,
+    o	There is `1` subarray among the contiguous subarrays of length `2` with sum equal to `s = 1`, and it is `[1, 0]`.
+So the answer is 2.
+•	For `arr = [1, 2, 4, -1, 6, 1]`, `k = 3`, and `s = 6`, the output should be `solution(arr, k, s) = 3`.
+    o	There is `1` subarray among the contiguous subarrays of length `1` with sum equal to `s = 6`, and it is `[6]`,
+    o	There is  t subarray among the contiguous subarrays of length `2` with sum equal to `s = 6`, and it is `[2, 4]`,
+    o	There is `1` subarray among the contiguous subarrays of length `3` with sum equal to `s = 6`, and it is `[-1, 6, 1]`.
+    Note that the subarray `[1, 2, 4, -1]` would also sum to `s`, but its length is greater than `k`, so it's not applicable.
+    So the answer is `3`.
+    
+Input/Output
+•	[execution time limit] 5 seconds (r)
+•	[input] array.integer `arr`
+    An array of integers.
+    Guaranteed constraints:
+    `2 ≤ arr.length ≤ 105`,
+    `-109 ≤ arr[i] ≤ 109`.
+•	[input] integer `k`
+    A positive integer denoting the maximal length of the contiguous subarrays we'll be considering.
+    Guaranteed constraints:
+    `1 ≤ k ≤ arr.length`.
+•	[input] integer64 `s`
+    An integer representing the sum we're looking for within the contiguous subarrays. Note, that this integer may not fit in 32-bit type and thus is provided in a 64-bit type.
+    Guaranteed constraints:
+    `-1011 ≤ s ≤ 1011`.
+•	[output] integer64
+    The number of contiguous subarrays with the given sum.
+
+```{r}
+solution <- function(arr, k, s){
+  res = 0
+  curSum = 0 
+  prefixSums <- list(list(0, 0))
+
+  for (n in 1:length(arr)){
+    curSum = curSum + arr[n]
+    diff = curSum - s
+    # add results to prefixSum list 
+    if (curSum %in% sapply(prefixSums, function(x) x[[1]])) {
+      index <- which(sapply(prefixSums, function(x) (x[[1]] %in% curSum)))
+      prefixSums[[index]][[2]] <- append(prefixSums[[index]][[2]], n)
+      
+    } else {
+      prefixSums <- append(prefixSums, list(list(curSum, n)))
+    }
+    # get index of list where prefix Sum == diff
+    curSum_index <- which(sapply(prefixSums, function(x) (x[[1]] %in% diff)))
+    if (length(curSum_index)!=0){
+      # ensure that length of subarray > k 
+      res = res + sum(n-k+1 >= prefixSums[[curSum_index]][[2]])
+    }
+  }
+  return(res)
+}
+
+arr <- c(1, 0)
+k <- 2
+s <- 1
+solution(arr, k, s)
+
+arr <- c(1, 2, 4, -1, 6, 1)
+k <- 3
+s <- 6
+solution(arr, k, s)
+```
